@@ -1,0 +1,89 @@
+---
+title: 'Adjusted REML Effect Size Estimates: Power Card Strategy'
+output: 
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    toc_depth: 3
+date: "`r format(Sys.time(), '%d %B %Y')`"
+---
+
+```{r}
+library(scdhlm)
+library(tidyverse)
+library(nlme)
+
+PCO_REML <- read.csv("Power Card Only.csv")
+SPC_REML <- read.csv("Scenario and Power Card.csv")
+MG_REM <- read.csv("Main and Gen.csv")
+
+#Scenario & Power Card Condition
+# Linear Mixed Effects Model Fit by REML
+
+SPC_REML_Estimate <- lme(fixed = outcome ~ treatment, 
+                 random = ~ 1 | case, 
+                 correlation = corAR1(0, ~ time | case), 
+                 data = SPC_REML)
+                 
+ls(SPC_REML_Estimate)
+summary(SPC_REML_Estimate)
+```
+
+#Adjusted REML Effect Size Estimate & Confidence Intervals
+
+```{r}
+SPC_REML_ES <- g_mlm(SPC_REML_Estimate, p_const = c(0,1), r_const = c(1,0,1))
+summary(SPC_REML_ES)
+
+CI_g(SPC_REML_ES)
+```
+
+# Power Card Condition
+# Linear Mixed Effects Model Fit by REML
+
+```{r}
+PCO_REML_Estimate <- lme(fixed = outcome ~ treatment, 
+                 random = ~ 1 | case, 
+                 correlation = corAR1(0, ~ time | case), 
+                 data = PCO_REML)
+
+summary(PCO_REML_Estimate)
+```
+
+#Adjusted REML Effect Size Estimate & Confidence Intervals
+
+```{r}
+PCO_REML_ES <- g_REML(PCO_REML_Estimate, p_const = c(0,1), r_const = c(1,0,1), returnModel=FALSE)
+
+summary("g_REML")
+```
+
+# Maintenance & Generalization Condition
+# Linear Mixed Effects Model Fit by REML
+
+```{r}
+
+MG_REML_Estimate <- lme(fixed = outcome ~ treatment, 
+                 random = ~ 1 | case, 
+                 correlation = corAR1(0, ~ time | case), 
+                 data = MG_REM)
+
+ls(MG_REML_Estimate)                 
+
+summary(MG_REML_Estimate)
+```
+
+#Adjusted REML Effect Size Estimate & Confidence Intervals
+
+```{r}
+
+MG_REML_ES <- g_mlm(MG_REML_Estimate, p_const = c(0,1), r_const = c(1,0,1))
+
+ls(MG_REML_ES)
+
+summary(MG_REML_ES)
+
+CI_g(MG_REML_ES)
+```
